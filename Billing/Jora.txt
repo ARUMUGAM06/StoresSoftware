@@ -1,0 +1,147 @@
+-- Directory DB
+
+create database ABCDirectory on (Name=ABCDirectory,Filename='D:\Data\ABCDirectory.mdf')
+log on(Name=ABCDirectory_Log,FileName='D:\Data\ABCDirectoryLog.ldf')
+
+
+
+---Tables
+
+--Operator
+
+
+
+create table Operator(
+Name varchar(40) Default '',
+OperatorCode int  unique Default 0,
+Password nvarchar(128)  Default '',
+Active varchar(1)  Default 'N' Check(Active='N' or Active='Y'),
+ProUser varchar(1) Default 'N'Check(ProUser='N' or ProUser='Y'),
+EntryMode Varchar(1) Default 'N' Check(EntryMode='N' or EntryMode='Y'),
+ViewMode Varchar(1) Default 'N' Check(ViewMode='N' or ViewMode='Y'),
+EditMode Varchar(1) Default 'N' Check(EditMode='N' or EditMode='Y'),
+DeleteMode Varchar(1) Default 'N' Check(DeleteMode='N' or DeleteMode='Y'),
+CancelAccess Varchar(1) Default 'N' Check(CancelAccess='N' or CancelAccess='Y'),
+RateEntry Varchar(1) Default 'N' Check(RateEntry='N' or RateEntry='Y'),
+PreviousDateEntry Varchar(1) Default 'N' Check(PreviousDateEntry='N' or PreviousDateEntry='Y'),
+CompanyTag Varchar(3),
+CompanyFlag Varchar(2),
+AutoGen Varchar(1) Default 'N' Check(AutoGen='N' or AutoGen='Y'),
+CreatedBy int Default 1,
+CreatedDate Date default getDate(),
+CreatedTime DateTime default getDate(),
+ModifyBy int Default 0,
+ModifiedDate Date ,
+ModifiedTime DateTime 
+)
+
+insert into Operator(Name,OperatorCode,Password,Active,ProUser,EntryMode,ViewMode,EditMode,DeleteMode,CancelAccess,RateEntry,PreviousDateEntry,CompanyTag,CompanyFlag,AutoGen)
+values
+('ADMINISTRATOR',1,'123','Y','Y','Y','Y','Y','Y','Y','Y','Y','ABC','AC','Y')
+
+
+select * from  Operator
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+/***  HSNBasics ***/
+
+Create table HSNBasics (
+sno int identity ,
+hsncode varchar(50) unique default '',
+hsngroup int default 0,
+hsnname varchar(500) default '',
+CompanyTag Varchar(3),
+CompanyFlag Varchar(2),
+Sgst numeric(6,2),
+Cgst numeric(6,2),
+Igst numeric(6,2),
+Active varchar(1) check(Active='Y' or Active='N'),
+Createdby int default 0,
+CreatedDate date default getdate(),
+CreatedTime datetime default getdate(),
+ModifyBy int,
+ModifiedDate date,
+ModifiedTime datetime
+)
+
+insert into HSNBasics(hsncode,hsnname,CompanyTag,CompanyFlag,Sgst,Cgst,Igst,Active,Createdby)
+values('36984564','Basic Check Purpose','ABC','AC',1.5,1.5,3,'Y',1),
+('36984565','Basic Check Purpose-1','ABC','AC',9,9,18,'Y',1)
+
+select * from HSNBasics
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+/***  DirectoryNumGenerate ***/
+
+create table DirectoryNumGenerate (
+Sno int identity,
+tables varchar(25) unique,
+number int default 0,
+text varchar(250) default '',
+CompanyTag Varchar(3),
+CompanyFlag Varchar(2)
+)
+
+insert into DirectoryNumGenerate(tables,CompanyTag,CompanyFlag)
+values
+('Category','ABC','AC')
+select * from DirectoryNumGenerate
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+/*** Category ***/
+
+
+Create table Category(
+Sno int identity,
+Catno int Primary key,
+Catgroup int default 0,
+CatName varchar(50) check(CatName<>'' or CatName<>null),
+Active varchar(1) check(Active='Y' or Active='N'),
+Hsncode varchar(50) check(Hsncode<>'' or Hsncode<>null),
+SaleType varchar(1) check(SaleType<>'' or SaleType<>null),
+orderType int ,
+Createdby int default 0,
+CreatedDate date default getdate(),
+CreatedTime datetime default getdate(),
+ModifyBy int,
+ModifiedDate date,
+ModifiedTime datetime
+)
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+/*** HoDetails***/
+
+create table HoDetails(
+	CompanyName nvarchar(300) default '',
+	CompanyTag varchar(3) unique check(CompanyTag<>'' or CompanyTag<>null),
+	CompanyFlag varchar(2) unique check(CompanyFlag<>'' or CompanyFlag<>null),
+	Createdby int default 0,
+	CreatedDate date default getdate(),
+	CreatedTime datetime default getdate(),
+	ModifyBy int,
+	ModifiedDate date,
+	ModifiedTime datetime
+)
+
+
+insert into HoDetails(CompanyFlag,CompanyTag,CompanyName,Createdby)
+values 
+('AB','ABC','ABC Testing',1)
+
+
+select * from HoDetails
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
