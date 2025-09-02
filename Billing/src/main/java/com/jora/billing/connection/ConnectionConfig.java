@@ -1,14 +1,21 @@
 package com.jora.billing.connection;
 
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class ConnectionConfig {
+
+	private final BuildProperties buildProperties;
 
 	@SuppressWarnings("deprecation")
 	@Bean("directoryDataSource")
@@ -59,26 +66,27 @@ public class ConnectionConfig {
 
 	public HikariDataSource getDataSource(String servername, String portno, String password, String userName,
 			String dbName) {
-		HikariDataSource hikariDataSource = null;
+		HikariConfig hikariConfig = null;
 		try {
-			hikariDataSource = new HikariDataSource();
-			hikariDataSource.setPoolName("Billing");
-			hikariDataSource.setJdbcUrl("jdbc:sqlserver://" + servername + ":" + portno + ";databaseName=" + dbName
-					+ ";useSSL=false;encrypt=false; trustServerCertificate=true;autoReconnect=true");
-			hikariDataSource.setUsername(userName);
-			hikariDataSource.setPassword(password);
-			hikariDataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			hikariDataSource.setConnectionInitSql("select 1");
-			hikariDataSource.setConnectionTestQuery("select 1");
-			hikariDataSource.setMaximumPoolSize(10);
-			hikariDataSource.setConnectionTimeout(30000);
-			hikariDataSource.setIdleTimeout(60000);
-			hikariDataSource.setMaxLifetime(60000);
-
+			hikariConfig = new HikariConfig();
+			hikariConfig.setPoolName("Billing");
+			hikariConfig.setJdbcUrl("jdbc:sqlserver://" + servername + ":" + portno + ";databaseName=" + dbName
+					+ ";useSSL=false;encrypt=false; trustServerCertificate=true;autoReconnect=true;;applicationName="
+					+ buildProperties.getName());
+			hikariConfig.setUsername(userName);
+			hikariConfig.setPassword(password);
+			hikariConfig.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			hikariConfig.setConnectionInitSql("select 1");
+			hikariConfig.setConnectionTestQuery("select 1");
+			hikariConfig.setMaximumPoolSize(10);
+			hikariConfig.setConnectionTimeout(30000);
+			hikariConfig.setIdleTimeout(60000);
+			hikariConfig.setMaxLifetime(60000);
+			return new HikariDataSource(hikariConfig);
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw e;
 		}
-		return hikariDataSource;
 	}
 
 }

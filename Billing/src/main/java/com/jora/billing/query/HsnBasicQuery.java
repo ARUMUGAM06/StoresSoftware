@@ -19,4 +19,12 @@ public class HsnBasicQuery {
 		return builder.toString();
 	}
 
+	public String getActiveHsnBasics() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select hsncode,hsnname,hsngroup,companytag,companyflag \n");
+		sb.append("from HSNBasics with(nolock) \n");
+		sb.append("where isnull(active,'')='Y' \n");
+		return sb.toString();
+	}
+
 }

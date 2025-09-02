@@ -347,8 +347,9 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 				frmCategory = BillingApplication.applicationContext.getBean(FrmCategory.class);
 				((javax.swing.plaf.basic.BasicInternalFrameUI) frmCategory.getUI()).setNorthPane(null);
 				frmCategory.setVisible(true);
+				menuBar.setVisible(false);
+				panelSubButton.setVisible(true);
 				panelForm.add(frmCategory);
-				panelButton.setVisible(true);
 				btnAdd.requestFocus();
 				ApplicationCommon.setCurrentForm((FormAction) frmCategory);
 			} else if (e.getSource() == mnuItemHsnBasics) {
