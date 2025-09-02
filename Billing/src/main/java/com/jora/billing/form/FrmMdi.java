@@ -18,7 +18,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jora.billing.BillingApplication;
@@ -47,6 +46,8 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 
 //	@Autowired
 	private FrmHsnBasics frmHsnBasics;
+
+	private FrmProduct frmProduct;
 
 	public FrmMdi() {
 		getContentPane().setPreferredSize(new Dimension(ApplicationCommon.frameWidth, ApplicationCommon.frameHeight));
@@ -155,6 +156,13 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 		mnuDirectory.addMouseListener(this);
 		mnuDirectory.addActionListener(this);
 
+		mnuItemHsnBasics = new JMenuItem("HSN Basics", KeyEvent.VK_H);
+		mnuItemHsnBasics.setFont(new Font("", Font.PLAIN, 18));
+		mnuItemHsnBasics.addMouseListener(this);
+		mnuItemHsnBasics.addActionListener(this);
+		mnuDirectory.add(mnuItemHsnBasics);
+		menuBar.add(mnuDirectory);
+
 		mnuItemCategory = new JMenuItem("Category", KeyEvent.VK_C);
 		mnuItemCategory.setFont(new Font("", Font.PLAIN, 18));
 		mnuItemCategory.addMouseListener(this);
@@ -165,20 +173,13 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 		mnuItemProduct.setFont(new Font("", Font.PLAIN, 18));
 		mnuItemProduct.addMouseListener(this);
 		mnuItemProduct.addActionListener(this);
-//		mnuDirectory.add(mnuItemProduct);
+		mnuDirectory.add(mnuItemProduct);
 
 		mnuItemOperator = new JMenuItem("Operator", KeyEvent.VK_O);
 		mnuItemOperator.setFont(new Font("", Font.PLAIN, 18));
 		mnuItemOperator.addMouseListener(this);
 		mnuItemOperator.addActionListener(this);
-		mnuDirectory.add(mnuItemOperator);
-		menuBar.add(mnuDirectory);
-
-		mnuItemHsnBasics = new JMenuItem("HSN Basics", KeyEvent.VK_H);
-		mnuItemHsnBasics.setFont(new Font("", Font.PLAIN, 18));
-		mnuItemHsnBasics.addMouseListener(this);
-		mnuItemHsnBasics.addActionListener(this);
-		mnuDirectory.add(mnuItemHsnBasics);
+//		mnuDirectory.add(mnuItemOperator);
 		menuBar.add(mnuDirectory);
 
 		mnuTransaction = new JMenu("Transaction");
@@ -275,6 +276,15 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 				panelButton.setVisible(true);
 				btnAdd.requestFocus();
 				ApplicationCommon.setCurrentForm((FormAction) frmHsnBasics);
+			} else if (e.getSource() == mnuItemProduct) {
+				panelForm.removeAll();
+				frmProduct = BillingApplication.applicationContext.getBean(FrmProduct.class);
+				((javax.swing.plaf.basic.BasicInternalFrameUI) frmProduct.getUI()).setNorthPane(null);
+				frmProduct.setVisible(true);
+				panelForm.add(frmProduct);
+				panelButton.setVisible(true);
+				btnAdd.requestFocus();
+				ApplicationCommon.setCurrentForm((FormAction) frmProduct);
 			} else if (e.getSource() == mnuLogout) {
 				System.exit(0);
 			} else if (e.getSource() == btnAdd) {
@@ -321,7 +331,7 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 		try {
 			if (e.getSource() == mnuLogout) {
 				if (JOptionPane.showConfirmDialog(panelMain, "Are You Sure to Logout?", "LOGOUT",
-						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
+						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 					return;
 				}
 
@@ -357,12 +367,23 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 				frmHsnBasics = BillingApplication.applicationContext.getBean(FrmHsnBasics.class);
 				((javax.swing.plaf.basic.BasicInternalFrameUI) frmHsnBasics.getUI()).setNorthPane(null);
 				frmHsnBasics.setVisible(true);
+
 //				frmHsnBasics.setBounds(panelForm.getBounds());
 				panelForm.add(frmHsnBasics);
 				menuBar.setVisible(false);
 				panelSubButton.setVisible(true);
 				btnAdd.requestFocus();
 				ApplicationCommon.setCurrentForm((FormAction) frmHsnBasics);
+			} else if (e.getSource() == mnuItemProduct) {
+				panelForm.removeAll();
+				frmProduct = BillingApplication.applicationContext.getBean(FrmProduct.class);
+				((javax.swing.plaf.basic.BasicInternalFrameUI) frmProduct.getUI()).setNorthPane(null);
+				frmProduct.setVisible(true);
+				panelForm.add(frmProduct);
+				menuBar.setVisible(false);
+				panelSubButton.setVisible(true);
+				btnAdd.requestFocus();
+				ApplicationCommon.setCurrentForm((FormAction) frmProduct);
 			} else if (e.getSource() == mnuLogout) {
 				System.exit(0);
 			} else if (e.getSource() == btnAdd) {
@@ -396,6 +417,8 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 			} else if (e.getSource() == btnSave) {
 				btnView.requestFocus();
 			} else if (e.getSource() == btnView) {
+				btnPosting.requestFocus();
+			} else if (e.getSource() == btnPosting) {
 				btnClear.requestFocus();
 			} else if (e.getSource() == btnClear) {
 				btnClose.requestFocus();
@@ -404,6 +427,8 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 			if (e.getSource() == btnClose) {
 				btnClear.requestFocus();
 			} else if (e.getSource() == btnClear) {
+				btnPosting.requestFocus();
+			} else if (e.getSource() == btnPosting) {
 				btnView.requestFocus();
 			} else if (e.getSource() == btnView) {
 				btnSave.requestFocus();
@@ -490,6 +515,7 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 
 	public void CloseMethod() {
 		panelButton.setVisible(false);
+		menuBar.setVisible(true);
 		this.panelForm.removeAll();
 	}
 

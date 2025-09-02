@@ -6,6 +6,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.DecimalFormat;
+
 import javax.swing.BorderFactory;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
