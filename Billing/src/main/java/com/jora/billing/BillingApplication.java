@@ -15,9 +15,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.jora.billing.connection.ApplicationConfig;
-import com.jora.billing.form.FrmLogging;
 import com.jora.billing.form.FrmMdi;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })

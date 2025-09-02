@@ -300,6 +300,13 @@ public class FrmHsnBasics extends JInternalFrame
 	@Override
 	public void close() {
 		loadInitials();
+		this.dispose();
+		frmMdi.getBtnAdd().setEnabled(true);
+		frmMdi.getBtnSave().setText("Save");
+		frmMdi.getBtnSave().setMnemonic(KeyEvent.VK_S);
+		ApplicationCommon.setCurrentForm(null);
+		frmMdi.getPanelButton().setVisible(false);
+		frmMdi.CloseMethod();
 	}
 
 	@Override

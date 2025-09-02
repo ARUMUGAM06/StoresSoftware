@@ -23,14 +23,12 @@ import javax.swing.SwingUtilities;
 
 import org.springframework.stereotype.Component;
 
-import com.formdev.flatlaf.util.SwingUtils;
 import com.jora.billing.BillingApplication;
 import com.jora.billing.common.ApplicationCommon;
 import com.jora.billing.common.ComboBox;
 import com.jora.billing.common.PasswordField;
 import com.jora.billing.common.TextFieldInputSpecs.TextInputType;
 import com.jora.billing.logic.LoginLogic;
-import com.jora.encodedecode.common.EncryptionDecryption;
 
 @Component
 public class FrmLogging extends JFrame implements KeyListener, ActionListener, FocusListener {
