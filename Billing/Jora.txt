@@ -89,7 +89,9 @@ CompanyFlag Varchar(2)
 
 insert into DirectoryNumGenerate(tables,CompanyTag,CompanyFlag)
 values
-('Category','ABC','AC')
+('Category','ABC','AC'),
+('Product','ABC','AC')
+
 select * from DirectoryNumGenerate
 
 
