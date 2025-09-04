@@ -17,6 +17,7 @@ import org.springframework.context.annotation.ComponentScan;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.jora.billing.connection.ApplicationConfig;
 import com.jora.billing.form.FrmMdi;
+import com.jora.billing.form.FrmProduct;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @ComponentScan(basePackages = { "com.jora.billing.*" })

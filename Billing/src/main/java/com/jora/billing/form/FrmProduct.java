@@ -119,8 +119,18 @@ public class FrmProduct extends JInternalFrame
 		panelSubEntry.setVisible(true);
 		panelEntry.add(panelSubEntry);
 
+		lblCategory = new JLabel();
+		lblCategory = labelCreation("Category ", 40, 60, 100, 20, new Font("Calibri", Font.PLAIN, 20), Color.black,
+				true);
+		panelSubEntry.add(lblCategory);
+
+		cmbCatDesc = comboBoxCreation(cmbCatDesc, lblCategory.getX() + 100, lblCategory.getY(), 500, 30, Color.WHITE,
+				true, new Font("Ebrima", Font.BOLD, 16));
+		panelSubEntry.add(cmbCatDesc);
+
 		lblHsnCode = new JLabel();
-		lblHsnCode = labelCreation("HSNCode ", 40, 60, 100, 20, new Font("Calibri", Font.PLAIN, 20), Color.black, true);
+		lblHsnCode = labelCreation("HSNCode ", cmbCatDesc.getX() + 700, lblCategory.getY(), 100, 20,
+				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblHsnCode);
 
 		txtHsnCode = textFieldCreation(txtHsnCode, lblHsnCode.getX() + 100, lblHsnCode.getY() - 10, 300,
@@ -129,17 +139,26 @@ public class FrmProduct extends JInternalFrame
 		panelSubEntry.add(txtHsnCode);
 
 		lblProdDesc = new JLabel();
-		lblProdDesc = labelCreation("HSN Name ", lblHsnCode.getX(), lblHsnCode.getY() + 100, 100, 20,
+		lblProdDesc = labelCreation("Product ", lblCategory.getX(), lblCategory.getY() + 100, 100, 20,
 				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblProdDesc);
 
-		txtProdDesc = textFieldCreation(txtProdDesc, txtHsnCode.getX(), lblProdDesc.getY() - 10, 500,
+		txtProdDesc = textFieldCreation(txtProdDesc, cmbCatDesc.getX(), lblProdDesc.getY() - 10, 500,
 				ApplicationCommon.frameHeight * 3 / 100, TextInputType.ALPHANUMBER, 20, TextSpaceReq.REQUIRED, true,
 				new Font("Calibri", Font.PLAIN, 20));
 		panelSubEntry.add(txtProdDesc);
 
+		lblPrdGrp = new JLabel();
+		lblPrdGrp = labelCreation("Product Group  ", lblHsnCode.getX(), lblProdDesc.getY(), 100, 20,
+				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
+		panelSubEntry.add(lblPrdGrp);
+
+		cmbPrdGrp = comboBoxCreation(cmbPrdGrp, txtHsnCode.getX(), lblPrdGrp.getY(), 500, 30, Color.WHITE, true,
+				new Font("Ebrima", Font.BOLD, 16));
+		panelSubEntry.add(cmbPrdGrp);
+
 		lblSgst = new JLabel();
-		lblSgst = labelCreation("SGST ", lblHsnCode.getX(), lblProdDesc.getY() + 100, 100, 20,
+		lblSgst = labelCreation("SGST ", lblCategory.getX(), lblProdDesc.getY() + 100, 100, 20,
 				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblSgst);
 
@@ -159,7 +178,7 @@ public class FrmProduct extends JInternalFrame
 		panelSubEntry.add(txtCgst);
 
 		lblIgst = new JLabel();
-		lblIgst = labelCreation("IGST ", lblHsnCode.getX(), lblSgst.getY() + 100, 100, 20,
+		lblIgst = labelCreation("IGST ", lblCategory.getX(), lblSgst.getY() + 100, 100, 20,
 				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblIgst);
 
@@ -405,9 +424,9 @@ public class FrmProduct extends JInternalFrame
 		return chkBox;
 	}
 
-	private ComboBox<String> comboBoxCreation(ComboBox<String> cmbComboBox, int x, int y, int width, int height,
+	private ComboBox<Object> comboBoxCreation(ComboBox<Object> cmbComboBox, int x, int y, int width, int height,
 			Color color, boolean edit, Font font) {
-		cmbComboBox = new ComboBox<String>();
+		cmbComboBox = new ComboBox<Object>();
 
 		cmbComboBox.setBounds(x, y, width, height);
 		cmbComboBox.setBackground(color);
