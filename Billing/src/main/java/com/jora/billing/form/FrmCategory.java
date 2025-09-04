@@ -132,10 +132,10 @@ public class FrmCategory extends JInternalFrame
 		panelMain.add(panelView);
 
 		panelSubEntry = new JPanel(null);
-		panelSubEntry.setBounds(5 * panelView.getWidth() / 100, 5 * panelView.getHeight() / 100,
-				90 * panelView.getWidth() / 100, 90 * panelView.getHeight() / 100);
+		panelSubEntry.setBounds(2 * panelView.getWidth() / 100, 5 * panelView.getHeight() / 100,
+				96 * panelView.getWidth() / 100, 90 * panelView.getHeight() / 100);
 		panelSubEntry.setBackground(Color.decode("#FFFFFF"));
-		panelSubEntry.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.red));
+		panelSubEntry.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.blue));
 		panelSubEntry.setVisible(true);
 		panelView.add(panelSubEntry);
 
@@ -160,18 +160,26 @@ public class FrmCategory extends JInternalFrame
 		scrPane = new JScrollPane(tblView);
 		scrPane.setBounds(panelSubEntry.getWidth() * 5 / 100, panelSubEntry.getHeight() * 5 / 100, tableWidth,
 				panelSubEntry.getHeight() * 85 / 100);
+
+		JLabel lblHelp = new JLabel();
+		lblHelp = labelCreation("<< Press E for Edit >>", scrPane.getX(),
+				scrPane.getY() + scrPane.getHeight() + (scrPane.getHeight() * 3 / 100), scrPane.getWidth(),
+				ApplicationCommon.frameHeight * 4 / 100, new Font("Calibri", Font.PLAIN, 18), Color.black, true);
+		lblHelp.setHorizontalAlignment(JLabel.CENTER);
+
 		panelSubEntry.add(scrPane);
+		panelSubEntry.add(lblHelp);
 	}
 
 	private List<Column> getColumns(int width) {
 		List<Column> lstColumns = new ArrayList<Column>();
-		lstColumns.add(new Column("sno", 10 * width / 100, SwingConstants.CENTER));
-		lstColumns.add(new Column("Category no", 15 * width / 100, SwingConstants.CENTER));
-		lstColumns.add(new Column("Category Name", 30 * width / 100, SwingConstants.LEFT));
-		lstColumns.add(new Column("Hsnname", 30 * width / 100, SwingConstants.LEFT));
-		lstColumns.add(new Column("Saletype", 15 * width / 100, SwingConstants.LEFT));
-		lstColumns.add(new Column("Active", 10 * width / 100, SwingConstants.LEFT));
-		lstColumns.add(new Column("Created By", 40 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("sno", 8 * width / 100, SwingConstants.CENTER));
+		lstColumns.add(new Column("Category no", 12 * width / 100, SwingConstants.CENTER));
+		lstColumns.add(new Column("Category Name", 20 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("Hsnname", 22 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("Saletype", 10 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("Active", 8 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("Created By", 20 * width / 100, SwingConstants.LEFT));
 		return lstColumns;
 	}
 
@@ -190,7 +198,7 @@ public class FrmCategory extends JInternalFrame
 		panelSubEntry.setBounds(20 * panelEntry.getWidth() / 100, 20 * panelEntry.getHeight() / 100,
 				60 * panelEntry.getWidth() / 100, 60 * panelEntry.getHeight() / 100);
 		panelSubEntry.setBackground(Color.decode("#FFFFFF"));
-		panelSubEntry.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.red));
+		panelSubEntry.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.blue));
 		panelSubEntry.setVisible(true);
 		panelEntry.add(panelSubEntry);
 
@@ -338,6 +346,7 @@ public class FrmCategory extends JInternalFrame
 				}
 			}
 			loadInitials();
+			cmbHsnCode.setEnabled(true);
 			txtCatName.requestFocus();
 		} catch (Exception e) {
 			e.printStackTrace();

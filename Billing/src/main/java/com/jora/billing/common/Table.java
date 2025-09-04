@@ -245,10 +245,10 @@ public class Table extends JTable {
 
 	public void selectFirstRow() {
 		SwingUtilities.invokeLater(() -> {
-			if (getRowCount() > 0) {
-				setRowSelectionInterval(0, 0); // select first row
-				requestFocusInWindow(); // give table focus
-			}
+			setRowSelectionInterval(0, 0);
+		    setColumnSelectionInterval(0, 0);
+		    scrollRectToVisible(getCellRect(0, 0, true));
+		    requestFocusInWindow();
 		});
 
 	}

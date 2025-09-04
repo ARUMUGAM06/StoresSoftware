@@ -50,10 +50,10 @@ public class BillingApplication implements ApplicationContextAware {
 			UIManager.put("Button.focusedBackground", Color.BLUE);
 			UIManager.put("Button.focusedForeground", Color.WHITE);
 			
-//			// Set FlatLaf TableHeader hover/pressed colors globally
-//			UIManager.put("TableHeader.hoverable", Boolean.TRUE);
-//			UIManager.put("TableHeader.hoverBackground", new Color(60, 60, 140));   // hover color
-//			UIManager.put("TableHeader.pressedBackground", new Color(30, 30, 90));  // pressed color
+			// Set FlatLaf TableHeader hover/pressed colors globally
+			UIManager.put("TableHeader.hoverable", Boolean.TRUE);
+			UIManager.put("TableHeader.hoverBackground", new Color(60, 60, 140));   // hover color
+			UIManager.put("TableHeader.pressedBackground", new Color(30, 30, 90));  // pressed color
 
 
 			UIManager.put("Button.hoverBackground", Color.BLUE);
