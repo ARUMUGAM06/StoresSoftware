@@ -17,7 +17,6 @@ import org.springframework.context.annotation.ComponentScan;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.jora.billing.connection.ApplicationConfig;
 import com.jora.billing.form.FrmMdi;
-import com.jora.billing.form.FrmProduct;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @ComponentScan(basePackages = { "com.jora.billing.*" })
@@ -50,6 +49,12 @@ public class BillingApplication implements ApplicationContextAware {
 			UIManager.setLookAndFeel(new FlatIntelliJLaf());
 			UIManager.put("Button.focusedBackground", Color.BLUE);
 			UIManager.put("Button.focusedForeground", Color.WHITE);
+			
+//			// Set FlatLaf TableHeader hover/pressed colors globally
+//			UIManager.put("TableHeader.hoverable", Boolean.TRUE);
+//			UIManager.put("TableHeader.hoverBackground", new Color(60, 60, 140));   // hover color
+//			UIManager.put("TableHeader.pressedBackground", new Color(30, 30, 90));  // pressed color
+
 
 			UIManager.put("Button.hoverBackground", Color.BLUE);
 			UIManager.put("Button.hoverForeground", Color.WHITE);

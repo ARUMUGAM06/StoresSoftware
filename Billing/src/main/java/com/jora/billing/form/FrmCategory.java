@@ -7,7 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -16,6 +18,9 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
@@ -27,6 +32,9 @@ import com.jora.billing.common.FormAction;
 import com.jora.billing.common.JTextFieldEnum.TextInputType;
 import com.jora.billing.common.JTextFieldEnum.TextSpaceReq;
 import com.jora.billing.common.ListItem;
+import com.jora.billing.common.Table;
+import com.jora.billing.common.Table.Column;
+import com.jora.billing.common.Table.TableConfig;
 import com.jora.billing.common.TextField;
 import com.jora.billing.connection.ApplicationConfig;
 import com.jora.billing.logic.CategoryLogic;
@@ -34,16 +42,22 @@ import com.jora.billing.logic.CategoryLogic;
 @Component
 public class FrmCategory extends JInternalFrame
 		implements KeyListener, ActionListener, FormAction, InternalFrameListener {
-
 	private static final long serialVersionUID = 1L;
 	private JPanel panelMain, panelEntry, panelView;
 	private TextField txtCatGroup, txtCatName;
 	private ComboBox<ListItem> cmbHsnCode, cmbSaleType;
 	private JCheckBox chkActive;
 
+	private JScrollPane scrPane;
+	private Table tblView;
+
 	private final CategoryLogic categoryLogic;
 
 	private final FrmMdi frmMdi;
+
+	private List<Map<String, Object>> lstCategory = new ArrayList<>();
+
+	private boolean isUpdate = false;
 
 	public FrmCategory(CategoryLogic categoryLogic, FrmMdi frmMdi) throws Exception {
 		this.categoryLogic = categoryLogic;
@@ -67,6 +81,7 @@ public class FrmCategory extends JInternalFrame
 		cmbHsnCode.addKeyListener(this);
 		cmbSaleType.addKeyListener(this);
 		chkActive.addKeyListener(this);
+		tblView.addKeyListener(this);
 	}
 
 	@Override
@@ -82,12 +97,15 @@ public class FrmCategory extends JInternalFrame
 	}
 
 	public void loadInitials() {
+		lstCategory.clear();
 		txtCatGroup.setText("");
 		txtCatName.setText("");
 		cmbHsnCode.setSelectedIndex(0);
 		cmbSaleType.setSelectedIndex(0);
 		chkActive.setSelected(false);
-
+		frmMdi.getBtnSave().setText("Save");
+		frmMdi.getBtnSave().setMnemonic(KeyEvent.VK_S);
+		isUpdate = false;
 	}
 
 	private void componentCreation() {
@@ -105,6 +123,7 @@ public class FrmCategory extends JInternalFrame
 	}
 
 	private void panelViewCreation() {
+		JPanel panelSubEntry;
 		panelView = new JPanel(null);
 		panelView.setBounds(0, 0, ApplicationCommon.getInternalFrameWidth(),
 				ApplicationCommon.getInternalFrameHeight());
@@ -112,6 +131,48 @@ public class FrmCategory extends JInternalFrame
 		panelView.setVisible(false);
 		panelMain.add(panelView);
 
+		panelSubEntry = new JPanel(null);
+		panelSubEntry.setBounds(5 * panelView.getWidth() / 100, 5 * panelView.getHeight() / 100,
+				90 * panelView.getWidth() / 100, 90 * panelView.getHeight() / 100);
+		panelSubEntry.setBackground(Color.decode("#FFFFFF"));
+		panelSubEntry.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.red));
+		panelSubEntry.setVisible(true);
+		panelView.add(panelSubEntry);
+
+		TableConfig config = new TableConfig();
+		config.headerBgColor = new Color(40, 40, 100);
+		config.headerFgColor = Color.WHITE;
+		config.contentBgColor = Color.WHITE;
+		config.contentFgColor = Color.BLACK;
+		config.headerFont = new Font("Segoe UI", Font.BOLD, 16);
+		config.contentFont = new Font("Segoe UI", Font.PLAIN, 13);
+		config.selectionBgColor = new Color(0, 120, 215);
+		config.selectionFgColor = Color.WHITE;
+		config.allowColumnReordering = false;
+		config.autoResizeMode = JTable.AUTO_RESIZE_OFF;
+
+		int tableWidth = panelSubEntry.getWidth() * 90 / 100;
+		List<Column> columns = getColumns(tableWidth);
+		tblView = new Table(columns, config);
+		tblView.setPreferredScrollableViewportSize(
+				new Dimension(tblView.getPreferredSize().width, tblView.getRowHeight() * 5));
+
+		scrPane = new JScrollPane(tblView);
+		scrPane.setBounds(panelSubEntry.getWidth() * 5 / 100, panelSubEntry.getHeight() * 5 / 100, tableWidth,
+				panelSubEntry.getHeight() * 85 / 100);
+		panelSubEntry.add(scrPane);
+	}
+
+	private List<Column> getColumns(int width) {
+		List<Column> lstColumns = new ArrayList<Column>();
+		lstColumns.add(new Column("sno", 10 * width / 100, SwingConstants.CENTER));
+		lstColumns.add(new Column("Category no", 15 * width / 100, SwingConstants.CENTER));
+		lstColumns.add(new Column("Category Name", 30 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("Hsnname", 30 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("Saletype", 15 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("Active", 10 * width / 100, SwingConstants.LEFT));
+		lstColumns.add(new Column("Created By", 40 * width / 100, SwingConstants.LEFT));
+		return lstColumns;
 	}
 
 	private void panelEntryCreation() {
@@ -242,25 +303,42 @@ public class FrmCategory extends JInternalFrame
 				txtCatName.requestFocus();
 				return;
 			}
-			Map<String, Object> saveMap = new HashMap<>();
-			saveMap.put("catname", txtCatName.getText());
-			saveMap.put("hsncode", cmbHsnCode.getSelectedItemValue());
-			saveMap.put("saletype", cmbSaleType.getSelectedItemValue());
-			saveMap.put("active", chkActive.isSelected() ? "Y" : "N");
-			saveMap.put("table", "category");
-			saveMap.put("companytag", ApplicationConfig.companyTag);
-			saveMap.put("companyflag", ApplicationConfig.companyFlag);
-			saveMap.put("createdby", ApplicationCommon.getMapOperDetails().get("OperatorCode"));
+			if (!isUpdate) {
+				Map<String, Object> saveMap = new HashMap<>();
+				saveMap.put("catname", txtCatName.getText());
+				saveMap.put("hsncode", cmbHsnCode.getSelectedItemValue());
+				saveMap.put("saletype", cmbSaleType.getSelectedItemValue());
+				saveMap.put("active", chkActive.isSelected() ? "Y" : "N");
+				saveMap.put("table", "category");
+				saveMap.put("companytag", ApplicationConfig.companyTag);
+				saveMap.put("companyflag", ApplicationConfig.companyFlag);
+				saveMap.put("createdby", ApplicationCommon.getMapOperDetails().get("OperatorCode"));
 
-			boolean save = categoryLogic.saveCategory(saveMap);
+				boolean save = categoryLogic.saveCategory(saveMap);
+				if (save != false) {
+					JOptionPane.showMessageDialog(panelMain, "Category Saved SuccessFully...!", getTitle(),
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+			} else {
+				Map<String, Object> saveMap = new HashMap<>();
+				saveMap.put("catno", lstCategory.get(tblView.getSelectedRow()).get("catno"));
+				saveMap.put("catname", txtCatName.getText());
+				saveMap.put("hsncode", cmbHsnCode.getSelectedItemValue());
+				saveMap.put("saletype", cmbSaleType.getSelectedItemValue());
+				saveMap.put("active", chkActive.isSelected() ? "Y" : "N");
+				saveMap.put("table", "category");
+				saveMap.put("companytag", ApplicationConfig.companyTag);
+				saveMap.put("companyflag", ApplicationConfig.companyFlag);
+				saveMap.put("modifyby", ApplicationCommon.getMapOperDetails().get("OperatorCode"));
 
-			if (save != false) {
-				JOptionPane.showMessageDialog(panelMain, "Category Saved SuccessFully...!", getTitle(),
-						JOptionPane.INFORMATION_MESSAGE);
-				loadInitials();
-				txtCatName.requestFocus();
+				boolean update = categoryLogic.updateCategory(saveMap);
+				if (update != false) {
+					JOptionPane.showMessageDialog(panelMain, "Category updated SuccessFully...!", getTitle(),
+							JOptionPane.INFORMATION_MESSAGE);
+				}
 			}
-
+			loadInitials();
+			txtCatName.requestFocus();
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(panelMain, e.getMessage(), getTitle(), JOptionPane.ERROR_MESSAGE);
@@ -275,13 +353,24 @@ public class FrmCategory extends JInternalFrame
 
 	@Override
 	public void view() {
-
+		try {
+			tblView.setEnabled(true);
+			lstCategory = categoryLogic.view(tblView);
+			panelEntry.setVisible(false);
+			panelView.setVisible(true);
+			tblView.selectFirstRow();
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(panelMain, e.getMessage(), getTitle(), JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	@Override
 	public void clear() {
 		loadInitials();
 		ApplicationCommon.componentEnableDisable(getContentPane().getComponents(), false);
+		panelEntry.setVisible(true);
+		panelView.setVisible(false);
 		frmMdi.getBtnAdd().requestFocus();
 	}
 
@@ -290,8 +379,6 @@ public class FrmCategory extends JInternalFrame
 		loadInitials();
 		this.dispose();
 		frmMdi.getBtnAdd().setEnabled(true);
-		frmMdi.getBtnSave().setText("Save");
-		frmMdi.getBtnSave().setMnemonic(KeyEvent.VK_S);
 		ApplicationCommon.setCurrentForm(null);
 		frmMdi.getPanelButton().setVisible(false);
 		frmMdi.CloseMethod();
@@ -317,13 +404,46 @@ public class FrmCategory extends JInternalFrame
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_ENTER: {
 			if (e.getSource() == txtCatName) {
-				cmbHsnCode.requestFocus();
+				if (cmbHsnCode.isEnabled()) {
+					cmbHsnCode.requestFocus();
+				} else {
+					cmbSaleType.requestFocus();
+				}
 			} else if (e.getSource() == cmbHsnCode) {
 				cmbSaleType.requestFocus();
 			} else if (e.getSource() == cmbSaleType) {
 				chkActive.requestFocus();
 			} else if (e.getSource() == chkActive) {
 				frmMdi.getBtnSave().requestFocus();
+			}
+			break;
+		}
+		case KeyEvent.VK_E: {
+			if (e.getSource() == tblView) {
+
+				if (JOptionPane.showConfirmDialog(panelMain, "Do you want to Edit?", "Confirm",
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) {
+					return;
+				}
+
+				panelView.setVisible(false);
+				cmbHsnCode.setEnabled(false);
+
+				panelEntry.setVisible(true);
+				txtCatName.setEnabled(true);
+				cmbSaleType.setEnabled(true);
+				chkActive.setEnabled(true);
+
+				isUpdate = true;
+				Map<String, Object> categoryMap = lstCategory.get(tblView.getSelectedRow());
+				txtCatName.setText(categoryMap.get("catname").toString());
+				cmbHsnCode.setSelectedItemValue(categoryMap.get("hsncode").toString());
+				cmbSaleType.setSelectedItemValue(categoryMap.get("saletype").toString());
+				chkActive.setSelected("Y".equalsIgnoreCase(categoryMap.get("active").toString()));
+
+				frmMdi.getBtnSave().setText("Update");
+				frmMdi.getBtnSave().setMnemonic(KeyEvent.VK_U);
+				txtCatName.requestFocus();
 			}
 			break;
 		}
