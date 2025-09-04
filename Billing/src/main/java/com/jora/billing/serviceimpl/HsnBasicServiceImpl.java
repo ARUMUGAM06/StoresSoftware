@@ -1,5 +1,6 @@
 package com.jora.billing.serviceimpl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,11 @@ public class HsnBasicServiceImpl implements HsnBasicService {
 	@Override
 	public String chkHsnCode(Map<String, Object> mapHsn) throws Exception {
 		return hsnBasicDao.chkHsnCode(mapHsn);
+	}
+
+	@Override
+	public List<Map<String, Object>> getActiveHsnBasics() throws Exception {
+		return hsnBasicDao.getActiveHsnBasics();
 	}
 
 }
