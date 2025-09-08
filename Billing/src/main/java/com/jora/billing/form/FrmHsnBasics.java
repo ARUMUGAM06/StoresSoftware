@@ -121,7 +121,7 @@ public class FrmHsnBasics extends JInternalFrame
 		panelSubEntry.add(lblHsnCode);
 
 		txtHsnCode = textFieldCreation(txtHsnCode, lblHsnCode.getX() + 100, lblHsnCode.getY() - 10, 300,
-				ApplicationCommon.frameHeight * 3 / 100, TextInputType.ALPHANUMBER, 20, TextSpaceReq.NOTREQUIRED, true,
+				ApplicationCommon.frameHeight * 3 / 100, TextInputType.ALPHANUMBER, 50, TextSpaceReq.NOTREQUIRED, true,
 				new Font("Calibri", Font.PLAIN, 20));
 		panelSubEntry.add(txtHsnCode);
 

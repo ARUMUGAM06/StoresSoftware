@@ -12,4 +12,10 @@ public class CategoryQuery {
 		return sb.toString();
 	}
 
+	public String loadCategory() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select Catno,CatName from Category where Active='Y' ");
+		return sb.toString();
+	}
+
 }
