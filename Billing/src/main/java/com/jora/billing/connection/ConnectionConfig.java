@@ -66,6 +66,8 @@ public class ConnectionConfig {
 
 	public HikariDataSource getDataSource(String servername, String portno, String password, String userName,
 			String dbName) {
+//		servername = "Sixface";
+//		password = "six";
 		HikariConfig hikariConfig = null;
 		try {
 			hikariConfig = new HikariConfig();

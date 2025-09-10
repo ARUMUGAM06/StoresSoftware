@@ -9,4 +9,8 @@ public interface CategoryDao {
 
 	List<Map<String, Object>> loadCategory() throws Exception;
 
+	List<Map<String, Object>> view() throws Exception;
+
+	void update(Map<String, Object> saveMap) throws Exception;
+
 }

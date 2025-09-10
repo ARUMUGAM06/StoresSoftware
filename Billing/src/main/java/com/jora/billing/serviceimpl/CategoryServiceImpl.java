@@ -1,5 +1,6 @@
 package com.jora.billing.serviceimpl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -39,4 +40,24 @@ public class CategoryServiceImpl implements CategoryService {
 		}
 	}
 
+	@Override
+	public List<Map<String, Object>> view() throws Exception {
+		return categoryDao.view();
+	}
+
+	@Override
+	public boolean update(Map<String, Object> saveMap) throws Exception {
+		Connection connection = null;
+		try {
+			connection = new Connection(directoryDataSource);
+			categoryDao.update(saveMap);
+			connection.commit();
+			return true;
+		} catch (Exception e) {
+			if (null != connection) {
+				connection.rollback();
+			}
+			throw e;
+		}
+	}
 }
