@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.jora.billing.common.ApplicationCommon;
@@ -28,7 +31,11 @@ import com.jora.billing.common.TextField;
 import com.jora.billing.common.JTextFieldEnum.TextInputType;
 import com.jora.billing.common.JTextFieldEnum.TextSpaceReq;
 import com.jora.billing.connection.ApplicationConfig;
+import com.jora.billing.logic.LogicCommon;
 import com.jora.billing.logic.LogicHsnBasic;
+import com.jora.billing.logic.LogicProduct;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 public class FrmProduct extends JInternalFrame
@@ -43,21 +50,26 @@ public class FrmProduct extends JInternalFrame
 	private JCheckBox chkActive;
 	private ComboBox<Object> cmbCatDesc, cmbSaleType, cmbPurType, cmbPrdGrp, cmbTaxBasedOn, cmbUnit;
 	private JLabel lblInfo;
-	private final LogicHsnBasic logicHsnBasic;
-	private final FrmMdi frmMdi;
 
-	public FrmProduct(LogicHsnBasic logicHsnBasic, FrmMdi frmMdi) throws Exception {
+	@Autowired
+	private FrmMdi frmMdi;
+
+	private final LogicCommon logicCommon;
+	private final LogicProduct logicProduct;
+
+	public FrmProduct(LogicCommon logicCommon, LogicProduct logicProduct) throws Exception {
 		getContentPane().setPreferredSize(
 				new Dimension(ApplicationCommon.getInternalFrameWidth(), ApplicationCommon.getInternalFrameHeight()));
 		getContentPane().setSize(
 				new Dimension(ApplicationCommon.getInternalFrameWidth(), ApplicationCommon.getInternalFrameHeight()));
 		pack();
-		setTitle("HSN BASICS");
+		setTitle("CATEGORY");
 		setMaximum(true);
 		setResizable(false);
 		addInternalFrameListener(this);
-		this.logicHsnBasic = logicHsnBasic;
-		this.frmMdi = frmMdi;
+		this.logicCommon = logicCommon;
+		this.logicProduct = logicProduct;
+
 	}
 
 	@Override
@@ -67,12 +79,24 @@ public class FrmProduct extends JInternalFrame
 	}
 
 	public void loadInitials() {
-		txtHsnCode.setText("");
-		txtProdDesc.setText("");
-		txtSgst.setText("");
-		txtCgst.setText("");
-		txtIgst.setText("");
-		chkActive.setSelected(false);
+		try {
+			txtHsnCode.setText("");
+			txtProdDesc.setText("");
+			txtSgst.setText("");
+			txtCgst.setText("");
+			txtIgst.setText("");
+			chkActive.setSelected(false);
+			logicCommon.loadCategory(cmbCatDesc, false);
+			logicCommon.loadSPType(cmbSaleType, false);
+			logicCommon.loadSPType(cmbPurType, false);
+			logicProduct.loadTaxBasedOn(cmbTaxBasedOn);
+
+			txtCgst.setEditable(false);
+			txtSgst.setEditable(false);
+			txtIgst.setEditable(false);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(panelMain, e.getMessage(), getTitle(), JOptionPane.ERROR_MESSAGE);
+		}
 
 	}
 
@@ -124,8 +148,9 @@ public class FrmProduct extends JInternalFrame
 				true);
 		panelSubEntry.add(lblCategory);
 
-		cmbCatDesc = comboBoxCreation(cmbCatDesc, lblCategory.getX() + 100, lblCategory.getY(), 500, 30, Color.WHITE,
+		cmbCatDesc = comboBoxCreation(cmbCatDesc, lblCategory.getX() + 120, lblCategory.getY(), 500, 30, Color.WHITE,
 				true, new Font("Ebrima", Font.BOLD, 16));
+
 		panelSubEntry.add(cmbCatDesc);
 
 		lblHsnCode = new JLabel();
@@ -133,8 +158,8 @@ public class FrmProduct extends JInternalFrame
 				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblHsnCode);
 
-		txtHsnCode = textFieldCreation(txtHsnCode, lblHsnCode.getX() + 100, lblHsnCode.getY() - 10, 300,
-				ApplicationCommon.frameHeight * 3 / 100, TextInputType.ALPHANUMBER, 20, TextSpaceReq.NOTREQUIRED, true,
+		txtHsnCode = textFieldCreation(txtHsnCode, lblHsnCode.getX() + 160, lblHsnCode.getY() - 10, 300,
+				ApplicationCommon.frameHeight * 3 / 100, TextInputType.ALPHANUMBER, 50, TextSpaceReq.NOTREQUIRED, true,
 				new Font("Calibri", Font.PLAIN, 20));
 		panelSubEntry.add(txtHsnCode);
 
@@ -149,7 +174,7 @@ public class FrmProduct extends JInternalFrame
 		panelSubEntry.add(txtProdDesc);
 
 		lblPrdGrp = new JLabel();
-		lblPrdGrp = labelCreation("Product Group  ", lblHsnCode.getX(), lblProdDesc.getY(), 100, 20,
+		lblPrdGrp = labelCreation("Product Group  ", lblHsnCode.getX(), lblProdDesc.getY(), 150, 20,
 				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblPrdGrp);
 
@@ -157,22 +182,62 @@ public class FrmProduct extends JInternalFrame
 				new Font("Ebrima", Font.BOLD, 16));
 		panelSubEntry.add(cmbPrdGrp);
 
+		lblSaleType = new JLabel();
+		lblSaleType = labelCreation("Sales Type ", lblCategory.getX(), lblProdDesc.getY() + 100, 100, 20,
+				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
+		panelSubEntry.add(lblSaleType);
+
+		cmbSaleType = comboBoxCreation(cmbSaleType, txtProdDesc.getX(), lblSaleType.getY(), 500, 30, Color.WHITE, true,
+				new Font("Ebrima", Font.BOLD, 16));
+
+		panelSubEntry.add(cmbSaleType);
+
+		lblPurType = new JLabel();
+		lblPurType = labelCreation("Purchase Type ", lblHsnCode.getX(), lblSaleType.getY(), 150, 20,
+				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
+		panelSubEntry.add(lblPurType);
+
+		cmbPurType = comboBoxCreation(cmbPurType, txtHsnCode.getX(), lblPurType.getY(), 500, 30, Color.WHITE, true,
+				new Font("Ebrima", Font.BOLD, 16));
+
+		panelSubEntry.add(cmbPurType);
+
+		lblActive = new JLabel();
+		lblActive = labelCreation("Active ", lblCategory.getX(), lblSaleType.getY() + 100, 100, 20,
+				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
+		panelSubEntry.add(lblActive);
+
+		chkActive = checkBoxCreation(chkActive, cmbSaleType.getX(), lblActive.getY() - 13,
+				ApplicationCommon.frameWidth * 8 / 100, ApplicationCommon.frameHeight * 4 / 100, "YES", Color.black,
+				true, new Font("Calibri", Font.PLAIN, 20));
+		panelSubEntry.add(chkActive);
+
+		lblTaxBased = new JLabel();
+		lblTaxBased = labelCreation("Tax Based On ", lblHsnCode.getX(), lblActive.getY(), 150, 20,
+				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
+		panelSubEntry.add(lblTaxBased);
+
+		cmbTaxBasedOn = comboBoxCreation(cmbTaxBasedOn, txtHsnCode.getX(), lblTaxBased.getY(), 500, 30, Color.WHITE,
+				true, new Font("Ebrima", Font.BOLD, 16));
+
+		panelSubEntry.add(cmbTaxBasedOn);
+
 		lblSgst = new JLabel();
-		lblSgst = labelCreation("SGST ", lblCategory.getX(), lblProdDesc.getY() + 100, 100, 20,
+		lblSgst = labelCreation("SGST ", lblCategory.getX(), lblActive.getY() + 100, 100, 20,
 				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblSgst);
 
-		txtSgst = textFieldCreation(txtSgst, txtHsnCode.getX(), lblSgst.getY() - 10, 150,
+		txtSgst = textFieldCreation(txtSgst, cmbCatDesc.getX(), lblSgst.getY() - 10, 180,
 				ApplicationCommon.frameHeight * 3 / 100, TextInputType.NUMERIC, 6, TextSpaceReq.NOTREQUIRED, true,
 				new Font("Calibri", Font.PLAIN, 20));
 		panelSubEntry.add(txtSgst);
 
 		lblCgst = new JLabel();
-		lblCgst = labelCreation("CGST ", txtSgst.getX() + 200, lblSgst.getY(), 100, 20,
+		lblCgst = labelCreation("CGST ", lblHsnCode.getX(), lblSgst.getY(), 100, 20,
 				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblCgst);
 
-		txtCgst = textFieldCreation(txtCgst, lblCgst.getX() + 100, lblCgst.getY() - 10, 150,
+		txtCgst = textFieldCreation(txtCgst, txtHsnCode.getX(), lblCgst.getY() - 10, 150,
 				ApplicationCommon.frameHeight * 3 / 100, TextInputType.NUMERIC, 6, TextSpaceReq.NOTREQUIRED, true,
 				new Font("Calibri", Font.PLAIN, 20));
 		panelSubEntry.add(txtCgst);
@@ -182,23 +247,129 @@ public class FrmProduct extends JInternalFrame
 				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
 		panelSubEntry.add(lblIgst);
 
-		txtIgst = textFieldCreation(txtIgst, txtHsnCode.getX(), lblIgst.getY() - 10, 150,
+		txtIgst = textFieldCreation(txtIgst, cmbCatDesc.getX(), lblIgst.getY() - 10, 150,
 				ApplicationCommon.frameHeight * 3 / 100, TextInputType.NUMERIC, 6, TextSpaceReq.NOTREQUIRED, true,
 				new Font("Calibri", Font.PLAIN, 20));
 		panelSubEntry.add(txtIgst);
 
-		lblActive = new JLabel();
-		lblActive = labelCreation("Active ", lblCgst.getX(), lblIgst.getY(), 100, 20,
-				new Font("Calibri", Font.PLAIN, 20), Color.black, true);
-		panelSubEntry.add(lblActive);
-
-		chkActive = checkBoxCreation(chkActive, txtCgst.getX(), lblActive.getY() - 13,
-				ApplicationCommon.frameWidth * 8 / 100, ApplicationCommon.frameHeight * 4 / 100, "YES", Color.black,
-				true, new Font("Calibri", Font.PLAIN, 20));
-		panelSubEntry.add(chkActive);
+		comboBoxEditorComponent();
 
 		ApplicationCommon.componentEnableDisable(getContentPane().getComponents(), false);
 
+	}
+
+	private void comboBoxEditorComponent() {
+		cmbCatDesc.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (String.valueOf(cmbCatDesc.getSelectedItemValue()).equalsIgnoreCase("")
+							|| String.valueOf(cmbCatDesc.getSelectedItemValue()).equalsIgnoreCase("null")) {
+						JOptionPane.showMessageDialog(panelMain, "Select Valid Category...!", getTitle(),
+								JOptionPane.WARNING_MESSAGE);
+						cmbCatDesc.requestFocus();
+						return;
+					}
+					enterFromCatDesc();
+					txtProdDesc.requestFocus();
+				}
+
+			}
+		});
+
+		cmbSaleType.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (String.valueOf(cmbSaleType.getSelectedItemValue()).equalsIgnoreCase("")
+							|| String.valueOf(cmbSaleType.getSelectedItemValue()).equalsIgnoreCase("null")) {
+						JOptionPane.showMessageDialog(panelMain, "Select Valid SaleType...!", getTitle(),
+								JOptionPane.WARNING_MESSAGE);
+						cmbSaleType.requestFocus();
+						return;
+					}
+					cmbPurType.requestFocus();
+				}
+
+			}
+		});
+
+		cmbPurType.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (String.valueOf(cmbPurType.getSelectedItemValue()).equalsIgnoreCase("")
+							|| String.valueOf(cmbPurType.getSelectedItemValue()).equalsIgnoreCase("null")) {
+						JOptionPane.showMessageDialog(panelMain, "Select Valid Purchase Type...!", getTitle(),
+								JOptionPane.WARNING_MESSAGE);
+						cmbPurType.requestFocus();
+						return;
+					}
+					chkActive.requestFocus();
+				}
+
+			}
+		});
+
+		cmbTaxBasedOn.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					if (String.valueOf(cmbTaxBasedOn.getSelectedItemValue()).equalsIgnoreCase("")
+							|| String.valueOf(cmbTaxBasedOn.getSelectedItemValue()).equalsIgnoreCase("null")) {
+						JOptionPane.showMessageDialog(panelMain, "Select Tax Based On...!", getTitle(),
+								JOptionPane.WARNING_MESSAGE);
+						cmbTaxBasedOn.requestFocus();
+						return;
+					}
+
+					enterFromTaxBasedOn();
+					txtSgst.requestFocus();
+				}
+
+			}
+
+		});
 	}
 
 	@Override
@@ -231,16 +402,61 @@ public class FrmProduct extends JInternalFrame
 
 	}
 
+	private void enterFromTaxBasedOn() {
+		if (String.valueOf(cmbTaxBasedOn.getSelectedItemValue()).equalsIgnoreCase("C")) {
+			txtCgst.setEditable(false);
+			txtSgst.setEditable(false);
+			txtIgst.setEditable(false);
+		} else if (String.valueOf(cmbTaxBasedOn.getSelectedItemValue()).equalsIgnoreCase("P")) {
+			txtCgst.setEditable(true);
+			txtSgst.setEditable(true);
+			txtIgst.setEditable(true);
+		}
+
+	}
+
 	@Override
 	public void add() {
 		ApplicationCommon.componentEnableDisable(getContentPane().getComponents(), true);
-		txtHsnCode.requestFocus();
+		cmbCatDesc.requestFocus();
 	}
 
 	@Override
 	public void save() {
 		try {
-			Map<String, Object> mapHsn = new HashMap<>();
+			Map<String, Object> mapProduct = new HashMap<>();
+
+			if (String.valueOf(cmbCatDesc.getSelectedItemValue()).equalsIgnoreCase("")
+					|| String.valueOf(cmbCatDesc.getSelectedItemValue()).equalsIgnoreCase("null")) {
+				JOptionPane.showMessageDialog(panelMain, "Select Valid Category...!", getTitle(),
+						JOptionPane.WARNING_MESSAGE);
+				cmbCatDesc.requestFocus();
+				return;
+			}
+
+			if (String.valueOf(cmbSaleType.getSelectedItemValue()).equalsIgnoreCase("")
+					|| String.valueOf(cmbSaleType.getSelectedItemValue()).equalsIgnoreCase("null")) {
+				JOptionPane.showMessageDialog(panelMain, "Select Valid SaleType...!", getTitle(),
+						JOptionPane.WARNING_MESSAGE);
+				cmbSaleType.requestFocus();
+				return;
+			}
+
+			if (String.valueOf(cmbPurType.getSelectedItemValue()).equalsIgnoreCase("")
+					|| String.valueOf(cmbPurType.getSelectedItemValue()).equalsIgnoreCase("null")) {
+				JOptionPane.showMessageDialog(panelMain, "Select Valid Purchase Type...!", getTitle(),
+						JOptionPane.WARNING_MESSAGE);
+				cmbPurType.requestFocus();
+				return;
+			}
+
+			if (String.valueOf(cmbTaxBasedOn.getSelectedItemValue()).equalsIgnoreCase("")
+					|| String.valueOf(cmbTaxBasedOn.getSelectedItemValue()).equalsIgnoreCase("null")) {
+				JOptionPane.showMessageDialog(panelMain, "Select Tax Based On...!", getTitle(),
+						JOptionPane.WARNING_MESSAGE);
+				cmbTaxBasedOn.requestFocus();
+				return;
+			}
 
 			if (txtHsnCode.getText().equalsIgnoreCase("")) {
 				JOptionPane.showMessageDialog(panelMain, "HSN Code Should not be Empty...!", getTitle(),
@@ -250,7 +466,7 @@ public class FrmProduct extends JInternalFrame
 			}
 
 			if (txtProdDesc.getText().equalsIgnoreCase("")) {
-				JOptionPane.showMessageDialog(panelMain, "HSN Name Should not be Empty...!", getTitle(),
+				JOptionPane.showMessageDialog(panelMain, "Product Descripton Should not be Empty...!", getTitle(),
 						JOptionPane.WARNING_MESSAGE);
 				txtProdDesc.requestFocus();
 				return;
@@ -277,20 +493,24 @@ public class FrmProduct extends JInternalFrame
 				return;
 			}
 
-			mapHsn.put("hsncode", txtHsnCode.getText());
-			mapHsn.put("hsnname", txtProdDesc.getText());
-			mapHsn.put("sgst", txtSgst.getText().equalsIgnoreCase("") ? 0 : txtSgst.getText());
-			mapHsn.put("cgst", txtCgst.getText().equalsIgnoreCase("") ? 0 : txtSgst.getText());
-			mapHsn.put("igst", txtIgst.getText().equalsIgnoreCase("") ? 0 : txtSgst.getText());
-			mapHsn.put("active", chkActive.isSelected() ? "Y" : "N");
-			mapHsn.put("companytag", ApplicationConfig.companyTag);
-			mapHsn.put("companyflag", ApplicationConfig.companyFlag);
-			mapHsn.put("createdby", ApplicationCommon.getMapOperDetails().get("OperatorCode"));
+			mapProduct.put("catno", cmbCatDesc.getSelectedItemValue());
+			mapProduct.put("hsncode", txtHsnCode.getText());
+			mapProduct.put("proddesc", txtProdDesc.getText());
+			mapProduct.put("salestype", cmbSaleType.getSelectedItemValue());
+			mapProduct.put("puchasetype", cmbPurType.getSelectedItemValue());
+			mapProduct.put("sgst", txtSgst.getText().equalsIgnoreCase("") ? 0 : txtSgst.getText());
+			mapProduct.put("cgst", txtCgst.getText().equalsIgnoreCase("") ? 0 : txtSgst.getText());
+			mapProduct.put("igst", txtIgst.getText().equalsIgnoreCase("") ? 0 : txtSgst.getText());
+			mapProduct.put("active", chkActive.isSelected() ? "Y" : "N");
+			mapProduct.put("table", "Product");
+			mapProduct.put("companytag", ApplicationConfig.companyTag);
+			mapProduct.put("companyflag", ApplicationConfig.companyFlag);
+			mapProduct.put("createdby", ApplicationCommon.getMapOperDetails().get("OperatorCode"));
 
-			boolean save = logicHsnBasic.saveHsnBasic(mapHsn);
+			String proNo = logicProduct.saveProduct(mapProduct);
 
-			if (save) {
-				JOptionPane.showMessageDialog(panelMain, "HSNCode Saved SuccessFully...!", getTitle(),
+			if (!proNo.equalsIgnoreCase("")) {
+				JOptionPane.showMessageDialog(panelMain, "Product Saved SuccessFully...!", getTitle(),
 						JOptionPane.INFORMATION_MESSAGE);
 				loadInitials();
 				txtHsnCode.requestFocus();
@@ -322,13 +542,14 @@ public class FrmProduct extends JInternalFrame
 	@Override
 	public void close() {
 		loadInitials();
-		this.dispose();
+		this.setVisible(false);
 		frmMdi.getBtnAdd().setEnabled(true);
 		frmMdi.getBtnSave().setText("Save");
 		frmMdi.getBtnSave().setMnemonic(KeyEvent.VK_S);
 		ApplicationCommon.setCurrentForm(null);
 		frmMdi.getPanelButton().setVisible(false);
 		frmMdi.CloseMethod();
+
 	}
 
 	@Override
@@ -348,26 +569,42 @@ public class FrmProduct extends JInternalFrame
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_ENTER: {
-			if (e.getSource() == txtHsnCode) {
-				txtProdDesc.requestFocus();
-			} else if (e.getSource() == txtProdDesc) {
-				txtSgst.requestFocus();
-			} else if (e.getSource() == txtSgst) {
-				txtCgst.requestFocus();
-			} else if (e.getSource() == txtCgst) {
-				txtIgst.requestFocus();
-			} else if (e.getSource() == txtIgst) {
-				chkActive.requestFocus();
-			} else if (e.getSource() == chkActive) {
-				frmMdi.getBtnSave().requestFocus();
+		try {
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_ENTER: {
+				if (e.getSource() == txtHsnCode) {
+					txtProdDesc.requestFocus();
+				} else if (e.getSource() == txtProdDesc) {
+					cmbSaleType.requestFocus();
+				} else if (e.getSource() == txtSgst) {
+					txtCgst.requestFocus();
+				} else if (e.getSource() == txtCgst) {
+					txtIgst.requestFocus();
+				} else if (e.getSource() == txtIgst) {
+					frmMdi.getBtnSave().requestFocus();
+				} else if (e.getSource() == chkActive) {
+					cmbTaxBasedOn.requestFocus();
+				}
+
+				break;
 			}
 
-			break;
+			}
+		} catch (Exception e2) {
+			JOptionPane.showMessageDialog(panelMain, e2.getMessage(), getTitle(), JOptionPane.ERROR_MESSAGE);
 		}
-		default:
 
+	}
+
+	private void enterFromCatDesc() {
+		try {
+
+			logicProduct.enterFromCatDesc(txtHsnCode, cmbSaleType, txtSgst, txtCgst, txtIgst,
+					Integer.parseInt(String.valueOf(cmbCatDesc.getSelectedItemValue())));
+
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(panelMain, e.getMessage(), getTitle(), JOptionPane.ERROR_MESSAGE);
+			cmbCatDesc.requestFocus();
 		}
 	}
 

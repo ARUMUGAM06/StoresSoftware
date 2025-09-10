@@ -18,6 +18,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jora.billing.BillingApplication;
@@ -41,13 +42,11 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 //	@Autowired
 	private FrmOperator frmOperator;
 
-//	@Autowired
 	private FrmCategory frmCategory;
 
-//	@Autowired
 	private FrmHsnBasics frmHsnBasics;
 
-	private FrmProduct frmProduct;
+//	private FrmProduct frmProduct;
 
 	public FrmMdi() {
 		getContentPane().setPreferredSize(new Dimension(ApplicationCommon.frameWidth, ApplicationCommon.frameHeight));
@@ -236,9 +235,8 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 	public void mouseClicked(MouseEvent e) {
 		try {
 			if (e.getSource() == mnuLogout) {
-
 				if (JOptionPane.showConfirmDialog(panelMain, "Are You Sure to Logout?", "LOGOUT",
-						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
+						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 					return;
 				}
 
@@ -246,63 +244,11 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 				FrmLogging frmLogging = BillingApplication.applicationContext.getBean(FrmLogging.class);
 				frmLogging.loadInitials();
 				frmLogging.setVisible(true);
-			} else if (e.getSource() == mnuItemOperator) {
-				panelForm.removeAll();
-
-				frmOperator = BillingApplication.applicationContext.getBean(FrmOperator.class);
-
-				((javax.swing.plaf.basic.BasicInternalFrameUI) frmOperator.getUI()).setNorthPane(null);
-				frmOperator.setVisible(true);
-//				frmOperator.getPanelMain().setEnabled(false);
-				panelForm.add(frmOperator);
-				panelButton.setVisible(true);
-
-				ApplicationCommon.setCurrentForm((FormAction) frmOperator);
-			} else if (e.getSource() == mnuItemCategory) {
-				panelForm.removeAll();
-				frmCategory = BillingApplication.applicationContext.getBean(FrmCategory.class);
-				((javax.swing.plaf.basic.BasicInternalFrameUI) frmCategory.getUI()).setNorthPane(null);
-				frmCategory.setVisible(true);
-				panelForm.add(frmCategory);
-				panelButton.setVisible(true);
-				btnAdd.requestFocus();
-				ApplicationCommon.setCurrentForm((FormAction) frmCategory);
-			} else if (e.getSource() == mnuItemHsnBasics) {
-				panelForm.removeAll();
-				frmHsnBasics = BillingApplication.applicationContext.getBean(FrmHsnBasics.class);
-				((javax.swing.plaf.basic.BasicInternalFrameUI) frmHsnBasics.getUI()).setNorthPane(null);
-				frmHsnBasics.setVisible(true);
-				panelForm.add(frmHsnBasics);
-				panelButton.setVisible(true);
-				btnAdd.requestFocus();
-				ApplicationCommon.setCurrentForm((FormAction) frmHsnBasics);
-			} else if (e.getSource() == mnuItemProduct) {
-				panelForm.removeAll();
-				frmProduct = BillingApplication.applicationContext.getBean(FrmProduct.class);
-				((javax.swing.plaf.basic.BasicInternalFrameUI) frmProduct.getUI()).setNorthPane(null);
-				frmProduct.setVisible(true);
-				panelForm.add(frmProduct);
-				panelButton.setVisible(true);
-				btnAdd.requestFocus();
-				ApplicationCommon.setCurrentForm((FormAction) frmProduct);
-			} else if (e.getSource() == mnuLogout) {
-				System.exit(0);
-			} else if (e.getSource() == btnAdd) {
-				ApplicationCommon.getCurrentForm().add();
-			} else if (e.getSource() == btnSave) {
-				ApplicationCommon.getCurrentForm().save();
-
-			} else if (e.getSource() == btnView) {
-				ApplicationCommon.getCurrentForm().view();
-			} else if (e.getSource() == btnClear) {
-				ApplicationCommon.getCurrentForm().clear();
-			} else if (e.getSource() == btnClose) {
-				ApplicationCommon.getCurrentForm().close();
 			}
-
 		} catch (Exception e2) {
-
+			JOptionPane.showMessageDialog(panelMain, e2.getMessage(), getTitle(), JOptionPane.ERROR_MESSAGE);
 		}
+
 	}
 
 	@Override
@@ -366,24 +312,36 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 				panelForm.removeAll();
 				frmHsnBasics = BillingApplication.applicationContext.getBean(FrmHsnBasics.class);
 				((javax.swing.plaf.basic.BasicInternalFrameUI) frmHsnBasics.getUI()).setNorthPane(null);
-				frmHsnBasics.setVisible(true);
 
 //				frmHsnBasics.setBounds(panelForm.getBounds());
 				panelForm.add(frmHsnBasics);
+				frmHsnBasics.setVisible(true);
 				menuBar.setVisible(false);
+				panelButton.setVisible(true);
 				panelSubButton.setVisible(true);
 				btnAdd.requestFocus();
 				ApplicationCommon.setCurrentForm((FormAction) frmHsnBasics);
 			} else if (e.getSource() == mnuItemProduct) {
+
+//				panelForm.removeAll();
+//				FrmProduct frmProduct = BillingApplication.applicationContext.getBean(FrmProduct.class);
+////				((javax.swing.plaf.basic.BasicInternalFrameUI) frmProduct.getUI()).setNorthPane(null);
+//				panelForm.add(frmProduct);
+//				frmProduct.setVisible(true);
+//				panelButton.setVisible(true);
+//				btnAdd.requestFocus();
+//				ApplicationCommon.setCurrentForm((FormAction) frmProduct);
+
 				panelForm.removeAll();
-				frmProduct = BillingApplication.applicationContext.getBean(FrmProduct.class);
+				FrmProduct frmProduct = BillingApplication.applicationContext.getBean(FrmProduct.class);
 				((javax.swing.plaf.basic.BasicInternalFrameUI) frmProduct.getUI()).setNorthPane(null);
-				frmProduct.setVisible(true);
 				panelForm.add(frmProduct);
+				frmProduct.setVisible(true);
+				ApplicationCommon.setCurrentForm((FormAction) frmProduct);
 				menuBar.setVisible(false);
+				panelButton.setVisible(true);
 				panelSubButton.setVisible(true);
 				btnAdd.requestFocus();
-				ApplicationCommon.setCurrentForm((FormAction) frmProduct);
 			} else if (e.getSource() == mnuLogout) {
 				System.exit(0);
 			} else if (e.getSource() == btnAdd) {
@@ -514,7 +472,8 @@ public class FrmMdi extends JFrame implements KeyListener, ActionListener, Mouse
 	}
 
 	public void CloseMethod() {
-		panelButton.setVisible(false);
+		panelButton.setVisible(true);
+		panelSubButton.setVisible(false);
 		menuBar.setVisible(true);
 		this.panelForm.removeAll();
 	}

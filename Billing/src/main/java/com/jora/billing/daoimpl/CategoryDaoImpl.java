@@ -27,12 +27,17 @@ public class CategoryDaoImpl implements CategoryDao {
 	}
 
 	@Override
+	public List<Map<String, Object>> loadCategory() throws Exception {
+
+		return new JdbcTemplate(directoryDataSource).queryForList(categoryQuery.loadCategory());
+	}
+
 	public List<Map<String, Object>> view() throws Exception {
 		return new JdbcTemplate(directoryDataSource).queryForList(categoryQuery.view());
 	}
 
 	@Override
 	public void update(Map<String, Object> saveMap) throws Exception {
-		new NamedParameterJdbcTemplate(directoryDataSource).update(categoryQuery.update(), saveMap); 
+		new NamedParameterJdbcTemplate(directoryDataSource).update(categoryQuery.update(), saveMap);
 	}
 }
